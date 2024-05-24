@@ -1,0 +1,234 @@
+HTML
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommender</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>Movie Recommender</h1>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Popular Movies</a></li>
+                <li><a href="#">Genres</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+        <div class="hero">
+            <h2>Discover Your Next Favorite Movie</h2>
+            <p>Explore popular movies and get personalized recommendations.</p>
+            <input type="text" id="search" placeholder="Search for a movie...">
+            <button id="searchButton">Search</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="movies" class="movies-section"></section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Movie Recommender. All rights reserved.</p>
+    </footer>
+
+    <script src="movies.js"></script>
+</body>
+</html>
+
+
+CSS
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #141414;
+    color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #202020;
+    padding: 10px 20px;
+}
+
+nav h1 {
+    color: #e50914;
+    font-size: 1.5rem;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li {
+    margin: 0;
+}
+
+nav ul li a {
+    color: #f0f0f0;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.hero {
+    background: url('hero-image.jpg') no-repeat center center/cover;
+    padding: 50px 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.hero h2 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.hero input[type="text"], .hero button {
+    padding: 10px;
+    font-size: 1rem;
+    margin: 5px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+.hero input[type="text"] {
+    width: 60%;
+}
+
+.hero button {
+    background-color: #e50914;
+    color: #fff;
+    cursor: pointer;
+}
+
+.hero button:hover {
+    background-color: #d40813;
+}
+
+#movies {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px;
+}
+
+.movie {
+    background-color: #222;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 15px;
+    width: 200px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.movie img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.movie h2 {
+    font-size: 1.2rem;
+    margin: 10px 0 5px;
+}
+
+.movie p {
+    margin: 5px 0;
+}
+
+.movie:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+footer {
+    background-color: #202020;
+    text-align: center;
+    padding: 10px 0;
+    color: #f0f0f0;
+}
+
+@media (max-width: 600px) {
+    .hero input[type="text"] {
+        width: 100%;
+    }
+
+    .movie {
+        width: 90%;
+    }
+}
+
+
+JAVASCRIPT
+
+const apiKey = 'fc66d77b9dd702c93a6b7d4507074995'; // Replace with your actual TMDB API key
+
+document.getElementById('searchButton').addEventListener('click', () => {
+    const searchTerm = document.getElementById('search').value;
+    if (searchTerm.length > 2) {
+        searchMovies(searchTerm);
+    } else {
+        document.getElementById('movies').innerHTML = '<p>Please enter at least 3 characters to search.</p>';
+    }
+});
+
+function searchMovies(query) {
+    const apiUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-US&query=${query}&page=1&include_adult=false`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length > 0) {
+                displayMovies(data.results);
+            } else {
+                displayNoResults();
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+function displayMovies(movies) {
+    const moviesContainer = document.getElementById('movies');
+    moviesContainer.innerHTML = '';
+
+    movies.forEach(movie => {
+        const movieElement = document.createElement('div');
+        movieElement.classList.add('movie');
+
+        movieElement.innerHTML = `
+            <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
+            <h2>${movie.title}</h2>
+            <p>Rating: ${movie.vote_average}</p>
+            <p>Release Date: ${movie.release_date}</p>
+        `;
+
+        moviesContainer.appendChild(movieElement);
+    });
+}
+
+function displayNoResults() {
+    const moviesContainer = document.getElementById('movies');
+    moviesContainer.innerHTML = '<p>No movies found. Please try a different search term.</p>';
+}
+
+
